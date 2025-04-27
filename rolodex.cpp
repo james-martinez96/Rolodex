@@ -1,4 +1,3 @@
-#include <cstddef>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -12,45 +11,56 @@ struct Contact {
 class Rolodex {
 private:
     std::vector<Contact> contacts;
-    std::size_t current = 0; 
+    std::vector<Contact>::iterator current;
+
 public:
+    Rolodex() : current(contacts.end()) {} // Start with no valid contact
+
     void addContact(const std::string& name, const std::string& phone) {
         contacts.push_back({name, phone});
         sortContacts();
+        if (contacts.size() == 1) {
+            current = contacts.begin();
+        }
     }
 
     void removeCurrent() {
-        if (!contacts.empty()) {
-            contacts.erase(contacts.begin() + current);
-            if (current >= contacts.size()) {
-                current = contacts.size() - 1;
+        if (!contacts.empty() && current != contacts.end()) {
+            current = contacts.erase(current);
+            if (current == contacts.end() && !contacts.empty()) {
+                current = contacts.begin(); // wrap around if needed
             }
         }
     }
 
     void next() {
-        if (!contacts.empty()) {
-            current = (current + 1) % contacts.size();
+        if (!contacts.empty() && current != contacts.end()) {
+            ++current;
+            if (current == contacts.end()) {
+                current = contacts.begin();
+            }
         }
     }
 
     void previous() {
-        if (!contacts.empty()) {
-            current = (current - 1 + contacts.size()) % contacts.size();
+        if (!contacts.empty() && current != contacts.end()) {
+            if (current == contacts.begin()) {
+                current = contacts.end();
+            }
+            --current;
         }
     }
 
     void showCurrent() const {
-        if (contacts.empty()) {
+        if (contacts.empty() || current == contacts.end()) {
             std::cout << "No contacts.\n";
         } else {
-        const auto& c = contacts[current];
-        std::cout << "\n=====================\n";
-        std::cout << "   Current Contact   \n";
-        std::cout << "=====================\n";
-        std::cout << "Name : " << c.name << "\n";
-        std::cout << "Phone: " << c.phone << "\n";
-        std::cout << "=====================\n";
+            std::cout << "\n=====================\n";
+            std::cout << "   Current Contact   \n";
+            std::cout << "=====================\n";
+            std::cout << "Name : " << current->name << "\n";
+            std::cout << "Phone: " << current->phone << "\n";
+            std::cout << "=====================\n";
         }
     }
 
@@ -59,6 +69,9 @@ private:
         std::sort(contacts.begin(), contacts.end(), [](const Contact& a, const Contact& b) {
             return a.name < b.name;
         });
+        if (!contacts.empty()) {
+            current = contacts.begin();
+        }
     }
 };
 
