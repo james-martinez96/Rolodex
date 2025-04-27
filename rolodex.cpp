@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -11,7 +12,7 @@ struct Contact {
 class Rolodex {
 private:
     std::vector<Contact> contacts;
-    int current = 0; // Index of currently selected contact
+    std::size_t current = 0; 
 public:
     void addContact(const std::string& name, const std::string& phone) {
         contacts.push_back({name, phone});
@@ -83,7 +84,7 @@ int main() {
 
         switch(choice) {
             case 'A': {
-                std::cin.ignore(); // Clear the newline character
+                std::cin.ignore();
                 std::string name, phone;
                 std::cout << "Enter name: ";
                 std::getline(std::cin, name);
